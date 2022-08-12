@@ -23,9 +23,9 @@ def zero_shot_project(project_id: str, payload_id: str):
         if len(config.label_names) == 0:
             raise ValueError(
                 f"No labels found for project {project_id} & payload {payload_id}"
-            )    
+            )
         session_token = general.get_ctx_token()
-        
+
         record_label_association.delete_by_source_id(
             project_id, config.source_id, with_commit=True
         )
@@ -36,7 +36,7 @@ def zero_shot_project(project_id: str, payload_id: str):
         is_cancelled = False
         for batch in record_batches:
             if count % 10 == 0:
-                session_token = general.remove_and_refresh_session(session_token,True)
+                session_token = general.remove_and_refresh_session(session_token, True)
             progress = count / max_count
             information_source.update_payload(
                 project_id, payload_id, progress=progress, with_commit=True
@@ -68,16 +68,22 @@ def zero_shot_project(project_id: str, payload_id: str):
                         is_gold_star=False,
                         with_commit=None,
                     )
-            
-            if information_source.continue_payload(project_id,config.source_id,payload_id):
+
+            if information_source.continue_payload(
+                project_id, config.source_id, payload_id
+            ):
                 general.commit()
                 count += 1
             else:
                 is_cancelled = True
-                session_token = general.remove_and_refresh_session(session_token,True)
+                session_token = general.remove_and_refresh_session(session_token, True)
                 break
-        
-        state = enums.PayloadState.FAILED.value if is_cancelled else enums.PayloadState.FINISHED.value
+
+        state = (
+            enums.PayloadState.FAILED.value
+            if is_cancelled
+            else enums.PayloadState.FINISHED.value
+        )
         information_source.update_payload(
             project_id,
             payload_id,
@@ -91,7 +97,7 @@ def zero_shot_project(project_id: str, payload_id: str):
         )
     except:
         print(traceback.format_exc(), flush=True)
-        session_token = general.remove_and_refresh_session(session_token,True)
+        session_token = general.remove_and_refresh_session(session_token, True)
         information_source.update_payload(
             project_id,
             payload_id,
@@ -154,7 +160,7 @@ def get_zero_shot_10_records(
             result_set.config,
             label_names,
             record_item.text,
-            True,
+            result_set.run_individually,
             information_source_id,
         )
         result_records.append(
