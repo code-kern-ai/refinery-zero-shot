@@ -1,6 +1,8 @@
 #!/bin/bash
 trap "echo -ne '\nstopping container...' && docker stop refinery-zero-shot > /dev/null 2>&1 && echo -ne '\t\t [done]\n'" EXIT
 
+source check_config_service
+
 HOST_IP=$(docker network inspect bridge --format='{{json .IPAM.Config}}' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}' | tail -1)
 
 echo -ne 'stopping old container...'
@@ -17,6 +19,7 @@ docker run -d --rm \
 -p 7064:80 \
 -e POSTGRES=postgresql://postgres:onetask@graphql-postgres:5432 \
 -e WS_NOTIFY_ENDPOINT="http://refinery-websocket:8080" \
+-e MODEL_PROVIDER=http://refinery-model-provider:80 \
 --mount type=bind,source="$(pwd)"/,target=/app \
 -v /var/run/docker.sock:/var/run/docker.sock \
 --network dev-setup_default \
