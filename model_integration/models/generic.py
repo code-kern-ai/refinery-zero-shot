@@ -17,7 +17,7 @@ def get_labels_for_text(
     information_source_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     if __has_classifier(config):
-        classifier = __get_classifier(project_id, config)
+        classifier = __get_classifier(config)
     else:
         classifier = __get_classifier_with_web_socket_update(
             project_id, information_source_id, config
@@ -37,11 +37,11 @@ def __has_classifier(config: str) -> bool:
     return config in __classifier
 
 
-def __get_classifier(project_id: str, config: str) -> Pipeline:
+def __get_classifier(config: str) -> Pipeline:
     global __classifier
     if config not in __classifier:
         if get_config_value("is_managed"):
-            model = get_model_path(project_id, config)
+            model = get_model_path(config)
         else:
             model = config
 
@@ -67,7 +67,7 @@ def __get_classifier_with_web_socket_update(
     send_project_update(
         project_id, f"zero_shot_download:started{information_source_id_str}"
     )
-    classifier = __get_classifier(project_id, config)
+    classifier = __get_classifier(config)
     send_project_update(
         project_id, f"zero_shot_download:finished{information_source_id_str}"
     )
