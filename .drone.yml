@@ -22,9 +22,6 @@ steps:
         from_secret: docker_password
       repo: "registry.dev.onetask.ai/${DRONE_REPO}"
       tags: ["${DRONE_COMMIT_SHA}", "${DRONE_COMMIT_BRANCH}"]
-      cache_from:
-        - "registry.dev.onetask.ai/${DRONE_REPO}:dev"
-        - "registry.dev.onetask.ai/${DRONE_REPO}:${DRONE_COMMIT_BRANCH}"
 
 trigger:
   event:
