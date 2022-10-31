@@ -37,6 +37,21 @@ def zero_shot_text(
     return return_values, 200
 
 
+@app.post("/zero-shot/single-record")
+def zero_shot_text(
+    request: request_classes.SingleRecordRequest,
+) -> Tuple[List[Tuple[str, float]], int]:
+    session_token = general.get_ctx_token()
+    return_values = util.get_zero_shot_1_record(
+        request.project_id,
+        request.information_source_id,
+        request.record_id,
+        request.label_names,
+    )
+    general.remove_and_refresh_session(session_token)
+    return return_values, 200
+
+
 @app.post("/zero-shot/sample-records")
 def zero_shot_text(
     request: request_classes.SampleRecordsRequest,
@@ -51,7 +66,7 @@ def zero_shot_text(
 
 @app.post("/zero-shot/project")
 def zero_shot_project(request: request_classes.ProjectRequest) -> Tuple[str, int]:
-    #since this a "big" request session refesh logic in method itself
+    # since this a "big" request session refesh logic in method itself
     util.zero_shot_project(request.project_id, request.payload_id)
     return "", 200
 

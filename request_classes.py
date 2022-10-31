@@ -30,3 +30,10 @@ class SampleRecordsRequest(BaseModel):
     project_id: str
     information_source_id: str
     label_names: List[str]
+
+
+class SingleRecordRequest(BaseModel):
+    project_id: str
+    information_source_id: str
+    record_id: str
+    label_names: List[str]

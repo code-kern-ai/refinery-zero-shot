@@ -137,6 +137,46 @@ def get_zero_shot_labels(
     return return_values
 
 
+def get_zero_shot_1_record(
+    project_id: str,
+    information_source_id: str,
+    record_id: str,
+    label_names: Optional[List[str]] = None,
+):
+    zero_shot_is = information_source.get(project_id, information_source_id)
+    if not zero_shot_is:
+        raise ValueError("unknown information source:" + information_source_id)
+    result_set = information_source.get_zero_shot_is_data(
+        project_id, information_source_id
+    )
+    if result_set.is_type != enums.InformationSourceType.ZERO_SHOT.value:
+        raise ValueError("unknown information source type:" + result_set.is_type)
+    record_set = record.get_zero_shot_1_record(
+        project_id, result_set.attribute_name, record_id
+    )
+    if not label_names:
+        label_names = result_set.labels
+    result_records = []
+    for record_item in record_set:
+        result = get_zero_shot_labels(
+            project_id,
+            result_set.config,
+            label_names,
+            record_item.text,
+            result_set.run_individually,
+            information_source_id,
+        )
+        result_records.append(
+            {
+                "record_id": record_item.id,
+                "labels": [{"label_name": x[0], "confidence": x[1]} for x in result],
+                "checked_text": record_item.text,
+                "full_record_data": record_item.data,
+            }
+        )
+    return result_records
+
+
 def get_zero_shot_10_records(
     project_id: str, information_source_id: str, label_names: Optional[List[str]] = None
 ):
