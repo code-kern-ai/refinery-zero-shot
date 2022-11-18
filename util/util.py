@@ -76,6 +76,9 @@ def zero_shot_project(project_id: str, payload_id: str):
                 count += 1
             else:
                 is_cancelled = True
+                record_label_association.delete_by_source_id(
+                    project_id, config.source_id, True
+                )
                 session_token = general.remove_and_refresh_session(session_token, True)
                 break
 
