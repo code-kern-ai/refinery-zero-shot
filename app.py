@@ -4,7 +4,7 @@ from typing import List, Dict, Tuple
 import torch
 import request_classes
 from submodules.model.business_objects import general
-from util import util
+from util import util, config_handler
 
 app = FastAPI()
 
@@ -51,7 +51,7 @@ def zero_shot_text(
 
 @app.post("/zero-shot/project")
 def zero_shot_project(request: request_classes.ProjectRequest) -> Tuple[str, int]:
-    #since this a "big" request session refesh logic in method itself
+    # since this a "big" request session refesh logic in method itself
     util.zero_shot_project(request.project_id, request.payload_id)
     return "", 200
 
@@ -107,3 +107,9 @@ def recommendations() -> Tuple[List[Dict[str, str]], int]:
     ]
 
     return recommends, 200
+
+
+@app.put("/config_changed")
+def config_changed() -> int:
+    config_handler.refresh_config()
+    return 200
