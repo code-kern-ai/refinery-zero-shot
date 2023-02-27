@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from fastapi import FastAPI, responses, status
-from fastapi.encoders import jsonable_encoder
-from typing import List, Dict, Tuple
 import torch
 import request_classes
 from submodules.model.business_objects import general
@@ -17,7 +15,7 @@ if torch.cuda.is_available():
     )
 else:
     print(
-        f"--- Running on CPU. If you're facing performance issues, you should consider switching to a CUDA device",
+        "--- Running on CPU. If you're facing performance issues, you should consider switching to a CUDA device",
         flush=True,
     )
 
