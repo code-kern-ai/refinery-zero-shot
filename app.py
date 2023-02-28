@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from fastapi import FastAPI
-from typing import List, Dict, Tuple
+
+from fastapi import FastAPI, responses, status
 import torch
 import request_classes
 from submodules.model.business_objects import general
@@ -15,7 +15,7 @@ if torch.cuda.is_available():
     )
 else:
     print(
-        f"--- Running on CPU. If you're facing performance issues, you should consider switching to a CUDA device",
+        "--- Running on CPU. If you're facing performance issues, you should consider switching to a CUDA device",
         flush=True,
     )
 
@@ -23,7 +23,7 @@ else:
 @app.post("/zero-shot/text")
 def zero_shot_text(
     request: request_classes.TextRequest,
-) -> Tuple[List[Tuple[str, float]], int]:
+) -> responses.JSONResponse:
     session_token = general.get_ctx_token()
     return_values = util.get_zero_shot_labels(
         request.project_id,
@@ -34,30 +34,38 @@ def zero_shot_text(
         request.information_source_id,
     )
     general.remove_and_refresh_session(session_token)
-    return return_values, 200
+    return responses.JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=return_values,
+    )
 
 
 @app.post("/zero-shot/sample-records")
 def zero_shot_text(
     request: request_classes.SampleRecordsRequest,
-) -> Tuple[List[Tuple[str, float]], int]:
+) -> responses.JSONResponse:
     session_token = general.get_ctx_token()
     return_values = util.get_zero_shot_10_records(
         request.project_id, request.information_source_id, request.label_names
     )
     general.remove_and_refresh_session(session_token)
-    return return_values, 200
+    return responses.JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=return_values,
+    )
 
 
 @app.post("/zero-shot/project")
-def zero_shot_project(request: request_classes.ProjectRequest) -> Tuple[str, int]:
+def zero_shot_project(
+    request: request_classes.ProjectRequest,
+) -> responses.PlainTextResponse:
     # since this a "big" request session refesh logic in method itself
     util.zero_shot_project(request.project_id, request.payload_id)
-    return "", 200
+    return responses.PlainTextResponse(status_code=status.HTTP_200_OK)
 
 
 @app.get("/recommend")
-def recommendations() -> Tuple[List[Dict[str, str]], int]:
+def recommendations() -> responses.JSONResponse:
     recommends = [
         {
             "configString": "Sahajtomar/German_Zeroshot",
@@ -106,10 +114,13 @@ def recommendations() -> Tuple[List[Dict[str, str]], int]:
         },
     ]
 
-    return recommends, 200
+    return responses.JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=recommends,
+    )
 
 
 @app.put("/config_changed")
-def config_changed() -> int:
+def config_changed() -> responses.PlainTextResponse:
     config_handler.refresh_config()
-    return 200
+    return responses.PlainTextResponse(status_code=status.HTTP_200_OK)

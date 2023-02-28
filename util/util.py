@@ -168,7 +168,7 @@ def get_zero_shot_10_records(
         )
         result_records.append(
             {
-                "record_id": record_item.id,
+                "record_id": str(record_item.id),
                 "labels": [{"label_name": x[0], "confidence": x[1]} for x in result],
                 "checked_text": record_item.text,
                 "full_record_data": record_item.data,
