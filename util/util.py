@@ -31,7 +31,7 @@ def zero_shot_project(project_id: str, payload_id: str):
         )
         record_batches = record.get_record_id_groups(project_id)
         max_count = len(record_batches)
-        label_dict = {l[0]: l[1] for l in zip(config.label_names, config.label_ids)}
+        label_dict = {lx[0]: lx[1] for lx in zip(config.label_names, config.label_ids)}
         count = 0
         is_cancelled = False
         for batch in record_batches:
@@ -98,7 +98,7 @@ def zero_shot_project(project_id: str, payload_id: str):
             project_id,
             f"zero-shot:{payload_id}:state:{state}",
         )
-    except:
+    except Exception:
         print(traceback.format_exc(), flush=True)
         session_token = general.remove_and_refresh_session(session_token, True)
         information_source.update_payload(
@@ -111,8 +111,8 @@ def zero_shot_project(project_id: str, payload_id: str):
             project_id,
             f"zero-shot:{payload_id}:state:{enums.PayloadState.FAILED.value}",
         )
-
-    general.remove_and_refresh_session(session_token, False)
+    if session_token:
+        general.remove_and_refresh_session(session_token, False)
 
 
 def get_zero_shot_labels(
