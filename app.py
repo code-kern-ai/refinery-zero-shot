@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from fastapi import FastAPI, responses, status
+from fastapi import FastAPI, responses, status, Request
 import torch
 import request_classes
 from submodules.model.business_objects import general
@@ -20,11 +20,23 @@ else:
     )
 
 
+@app.middleware("http")
+async def handle_db_session(request: Request, call_next):
+    session_token = general.get_ctx_token()
+
+    request.state.session_token = session_token
+    try:
+        response = await call_next(request)
+    finally:
+        general.remove_and_refresh_session(session_token)
+
+    return response
+
+
 @app.post("/zero-shot/text")
 def zero_shot_text(
     request: request_classes.TextRequest,
 ) -> responses.JSONResponse:
-    session_token = general.get_ctx_token()
     return_values = util.get_zero_shot_labels(
         request.project_id,
         request.config,
@@ -33,7 +45,6 @@ def zero_shot_text(
         request.run_individually,
         request.information_source_id,
     )
-    general.remove_and_refresh_session(session_token)
     return responses.JSONResponse(
         status_code=status.HTTP_200_OK,
         content=return_values,
@@ -44,11 +55,9 @@ def zero_shot_text(
 def zero_shot_text(
     request: request_classes.SampleRecordsRequest,
 ) -> responses.JSONResponse:
-    session_token = general.get_ctx_token()
     return_values = util.get_zero_shot_10_records(
         request.project_id, request.information_source_id, request.label_names
     )
-    general.remove_and_refresh_session(session_token)
     return responses.JSONResponse(
         status_code=status.HTTP_200_OK,
         content=return_values,
@@ -59,7 +68,7 @@ def zero_shot_text(
 def zero_shot_project(
     request: request_classes.ProjectRequest,
 ) -> responses.PlainTextResponse:
-    # since this a "big" request session refesh logic in method itself
+    # since this a "big" request session refresh logic in method itself
     util.zero_shot_project(request.project_id, request.payload_id)
     return responses.PlainTextResponse(status_code=status.HTTP_200_OK)
 
@@ -138,4 +147,3 @@ def healthcheck() -> responses.PlainTextResponse:
     if not text:
         text = "OK"
     return responses.PlainTextResponse(text, status_code=status_code)
-
