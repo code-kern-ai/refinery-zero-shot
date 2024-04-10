@@ -95,15 +95,6 @@ def recommendations() -> responses.JSONResponse:
             "prio": 2,
         },
         {
-            "configString": "Narsil/deberta-large-mnli-zero-cls",
-            "avgTime": "~ 25 char per sec",
-            "language": "en",
-            "link": "https://huggingface.co/Narsil/deberta-large-mnli-zero-cls",
-            "base": "DeBERTa",
-            "size": "1.51 GB",
-            "prio": 3,
-        },
-        {
             "configString": "typeform/distilbert-base-uncased-mnli",
             "avgTime": "~ 275 char per sec",
             "language": "en",
