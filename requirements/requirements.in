@@ -1,1 +1,2 @@
 -r torch-cpu-requirements.txt
+pydantic==2.7.4
