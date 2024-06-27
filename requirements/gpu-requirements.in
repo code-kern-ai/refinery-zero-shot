@@ -1,1 +1,2 @@
 -r torch-cuda-requirements.txt
+pydantic==2.7.4
