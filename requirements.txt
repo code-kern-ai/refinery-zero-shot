@@ -47,8 +47,6 @@ fsspec==2024.6.0
     # via
     #   -r requirements/torch-cpu-requirements.txt
     #   huggingface-hub
-greenlet==3.0.3
-    # via sqlalchemy
 h11==0.14.0
     # via
     #   -r requirements/torch-cpu-requirements.txt
@@ -167,7 +165,7 @@ tokenizers==0.19.1
     # via
     #   -r requirements/torch-cpu-requirements.txt
     #   transformers
-torch==1.13.1+cpu
+torch==1.13.1
     # via -r requirements/torch-cpu-requirements.txt
 tqdm==4.66.4
     # via
